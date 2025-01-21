@@ -1,0 +1,119 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { generatePDF } from "@/utils/pdf";
+
+export default function Pagos() {
+  const [filtro, setFiltro] = useState({ dni: "", nombre_apellido: "" });
+  const [pagos, setPagos] = useState([]);
+  const [error, setError] = useState(""); 
+
+  const cargarPagos = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filtro.dni) params.append("dni", filtro.dni);
+      if (filtro.nombre_apellido) params.append("nombre_apellido", filtro.nombre_apellido);
+
+      const res = await fetch(`/api/pagos?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPagos(data);
+        setError(""); // Limpiar errores si todo va bien
+      } else {
+        throw new Error("Error al cargar los pagos.");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
+
+  useEffect(() => {
+    cargarPagos();
+  }, []);
+
+  const handlePDF = () => {
+    if (pagos.length === 0) {
+      setError("No hay pagos para generar un PDF.");
+      return;
+    }
+    setError(""); //Clean errors if no any problems
+    generatePDF(pagos);
+  };
+
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
+    setFiltro({ ...filtro, [name]: value });
+  };
+
+  const handleBuscar = () => {
+    //validation before carry out the search
+    if (filtro.dni && !/^\d{8}$/.test(filtro.dni)) {
+      setError("El DNI debe tener 8 dígitos.");
+      return;
+    }
+
+    setError("");  //Clean errors if the validation is success
+    cargarPagos();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        Historial de Pagos
+      </h1>
+      <div className="flex justify-center mb-6">
+        <div className="flex space-x-4">
+        <input
+          type="text"
+          name="nombre_apellido"
+          placeholder="Filtrar por Nombre o Apellido"
+          value={filtro.nombre_apellido}
+          onChange={handleFiltroChange}
+          className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+        <input
+          type="text"
+          name="dni"
+          placeholder="Filtrar por DNI"
+          value={filtro.dni}
+          onChange={handleFiltroChange}
+          className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+        <button 
+        onClick={handleBuscar}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
+        >
+          Buscar
+        </button>
+      </div>
+      </div>
+
+      {pagos.length > 0 ? (
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Lista de Pagos</h2>
+          <ul className="bg-white shadow-md rounded p-4">
+            {pagos.map((pago) => (
+              <li
+              key={pago.id}
+              className="flex justify-between items-center border-b py-2"
+              >
+              <span>{pago.nombre_apellido} - {pago.dni} </span>
+              <span>{pago.fecha_pago}</span>
+              <span>{pago.descripcion}</span>
+              <span>${pago.monto}</span>
+              </li>
+            ))}
+          </ul>
+          <button onClick={handlePDF}
+          className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          >
+            Generar PDF
+          </button>
+        </div>
+      ) : (
+        <p className="text-center text-gray-700">No se encontraron pagos.</p>
+      )}
+    </div>
+  );
+}
