@@ -1,18 +1,25 @@
+import {getToken} from 'next-auth/jwt';
+
 import { NextResponse } from "next/server";
 
-export function middleware(req) {
-    const response = NextResponse.next();
+export async function middleware(req) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    // Cors settings
+    //If not any token, return to the login
+    if (!token) {
+        return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
 
-    response.headers.set("Access-Control-Allow-Origin", "*"); //Change this for my domain in productions
-    response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    //verify if the user is the admin
+    if (token.user.role !== "admin") {
+        return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
 
-    return response;
+    //if the user is the admin, allow the access
+    return NextResponse.next();
 }
 
-//Configurar el middlware solo para las rutas de la API
+//apply this middleware just to the routes what i want to protect
 export const config = {
-    matcher: "/api/:path*",
+    matcher: ["/pagos/:path*", "/admin/:path*"],
 }

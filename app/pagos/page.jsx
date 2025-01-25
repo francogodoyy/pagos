@@ -1,12 +1,34 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { generatePDF } from "@/utils/pdf";
+import { useRouter } from "next/navigation";
 
 export default function Pagos() {
+  const {data: session, status } = useSession();
+  const router = useRouter(); 
   const [filtro, setFiltro] = useState({ dni: "", nombre_apellido: "" });
   const [pagos, setPagos] = useState([]);
   const [error, setError] = useState(""); 
+
+  const handleNuevoPago = () => {
+    router.push("/pagos/nuevo-pago");
+  };
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (!session) {
+      router.push("/admin/login");
+    } else if (session.user.role !== "admin") {
+      router.push("/admin/login");
+    }
+  }, [session, status, router]);
+
+  if (status === "loading" || !session) {
+    return <p>Cargando...</p>;
+  }
 
   const cargarPagos = async () => {
     try {
@@ -15,6 +37,7 @@ export default function Pagos() {
       if (filtro.nombre_apellido) params.append("nombre_apellido", filtro.nombre_apellido);
 
       const res = await fetch(`/api/pagos?${params.toString()}`);
+
       if (res.ok) {
         const data = await res.json();
         setPagos(data);
@@ -85,6 +108,12 @@ export default function Pagos() {
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
         >
           Buscar
+        </button>
+        <button
+          onClick={handleNuevoPago}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+          >
+        Registrar Nuevo Pago
         </button>
       </div>
       </div>
