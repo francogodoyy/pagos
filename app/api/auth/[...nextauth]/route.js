@@ -46,9 +46,12 @@ const handler = NextAuth({
       },
     },
     pages: {
-      signIn: "/admin/login", // Página personalizada para iniciar sesión
+      signIn: "/admin/login", 
     },
-    secret: process.env.NEXTAUTH_SECRET, // Asegúrate de tener esta variable en tu entorno
+    secret: process.env.NEXTAUTH_SECRET,
+    session: {
+      strategy: "jwt",
+    },
   });
   
   export { handler as GET, handler as POST };
