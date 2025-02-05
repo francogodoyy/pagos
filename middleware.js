@@ -1,25 +1,25 @@
-import {getToken} from 'next-auth/jwt';
-
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 export async function middleware(req) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    //If not any token, return to the login
-    if (!token) {
-        return NextResponse.redirect(new URL("/admin/login", req.url));
-    }
+  const isLoginRoute = req.nextUrl.pathname === "/admin/login";
+  const isProtectedRoute = req.nextUrl.pathname.startsWith("/pagos");
 
-    //verify if the user is the admin
-    if (token.user.role !== "admin") {
-        return NextResponse.redirect(new URL("/admin/login", req.url));
-    }
+  // Si intenta acceder a rutas protegidas sin token, redirigir al login
+  if (!token && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/admin/login", req.url));
+  }
 
-    //if the user is the admin, allow the access
-    return NextResponse.next();
+  // Si ya tiene un token y está intentando acceder al login, redirigir a /pagos
+  if (token && isLoginRoute) {
+    return NextResponse.redirect(new URL("/pagos", req.url));
+  }
+
+  return NextResponse.next();
 }
 
-//apply this middleware just to the routes what i want to protect
 export const config = {
-    matcher: ["/pagos/:path*", "/admin/:path*"],
-}
+  matcher: ["/admin/:path*", "/pagos/:path*"], // Asegúrate de que estas rutas están bien configuradas
+};

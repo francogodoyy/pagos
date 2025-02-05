@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+      { "source": "/admin/login", "destination": "/admin/login" },
+      { "source": "/pagos", "destination": "/pagos" },
+      { "source": "/pagos/nuevo-pago", "destination": "/pagos/nuevo-pago" }
+    ]
+  }
+  
