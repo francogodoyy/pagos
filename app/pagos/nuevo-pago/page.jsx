@@ -43,8 +43,14 @@ export default function NuevoPago() {
 
   if (success) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 space-y-4">
         <p className="text-green-600 font-bold text-lg">¡Pago Registrado!</p>
+        <button
+          onClick={handleVolver}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+        >
+          Volver a la sección de pagos
+        </button>
       </div>
     );
   }
@@ -75,13 +81,13 @@ export default function NuevoPago() {
         </div>
         <div>
           <label htmlFor="dni" className="block text-sm font-medium text-gray-600">
-            DNI del alumno
+            DNI
           </label>
           <input
             type="text"
             id="dni"
             name="dni"
-            placeholder="DNI del alumno"
+            placeholder="DNI"
             value={formData.dni}
             onChange={handleChange}
             required
