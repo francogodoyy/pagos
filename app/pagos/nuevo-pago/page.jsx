@@ -11,10 +11,10 @@ export default function NuevoPago() {
     monto: "",
     fecha_pago: "",
     descripcion: "",
-    correo: "", 
-    localidad: "", 
-    telefono: "", 
-    direccion: "", 
+    correo: "",
+    localidad: "",
+    telefono: "",
+    direccion: "",
   });
   const [success, setSuccess] = useState(false);
 
@@ -65,7 +65,10 @@ export default function NuevoPago() {
           Registrar Pago
         </h1>
         <div>
-          <label htmlFor="nombre_apellido" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="nombre_apellido"
+            className="block text-sm font-medium text-gray-600"
+          >
             Nombre y Apellido
           </label>
           <input
@@ -80,7 +83,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="dni" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="dni"
+            className="block text-sm font-medium text-gray-600"
+          >
             DNI
           </label>
           <input
@@ -95,7 +101,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="correo" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="correo"
+            className="block text-sm font-medium text-gray-600"
+          >
             Correo electrónico
           </label>
           <input
@@ -110,7 +119,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="localidad" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="localidad"
+            className="block text-sm font-medium text-gray-600"
+          >
             Localidad
           </label>
           <input
@@ -125,7 +137,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="telefono" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="telefono"
+            className="block text-sm font-medium text-gray-600"
+          >
             Teléfono
           </label>
           <input
@@ -140,7 +155,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="direccion" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="direccion"
+            className="block text-sm font-medium text-gray-600"
+          >
             Dirección
           </label>
           <input
@@ -155,7 +173,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="monto" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="monto"
+            className="block text-sm font-medium text-gray-600"
+          >
             Monto
           </label>
           <input
@@ -170,7 +191,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="fecha_pago" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="fecha_pago"
+            className="block text-sm font-medium text-gray-600"
+          >
             Fecha de Pago
           </label>
           <input
@@ -184,7 +208,10 @@ export default function NuevoPago() {
           />
         </div>
         <div>
-          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="descripcion"
+            className="block text-sm font-medium text-gray-600"
+          >
             Descripción
           </label>
           <textarea

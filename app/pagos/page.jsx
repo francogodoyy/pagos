@@ -16,6 +16,18 @@ export default function Pagos() {
     router.push("/pagos/nuevo-pago");
   };
 
+  const [filtroFecha, setFiltroFecha] = useState({
+    fechaInicio: "",
+    fechaFin: "",
+  });
+  const handleFiltroFechaChange = (e) => {
+    const { name, value } = e.target;
+    setFiltroFecha({ ...filtroFecha, [name]: value });
+  };
+  const handleBuscarPorFecha = () => {
+    cargarPagos();
+  };
+
   useEffect(() => {
     if (status === "loading") return;
 
@@ -34,7 +46,11 @@ export default function Pagos() {
     try {
       const params = new URLSearchParams();
       if (filtro.dni) params.append("dni", filtro.dni);
-      if (filtro.nombre_apellido) params.append("nombre_apellido", filtro.nombre_apellido);
+      if (filtro.nombre_apellido)
+        params.append("nombre_apellido", filtro.nombre_apellido);
+      if (filtroFecha.fechaInicio)
+        params.append("fechaInicio", filtroFecha.fechaInicio);
+      if (filtroFecha.fechaFin) params.append("fechaFin", filtroFecha.fechaFin);
 
       const res = await fetch(`/api/pagos?${params.toString()}`);
 
@@ -54,13 +70,32 @@ export default function Pagos() {
     cargarPagos();
   }, []);
 
-  const handlePDF = () => {
+  const generatePDF = () => {
     if (pagos.length === 0) {
       setError("No hay pagos para generar un PDF.");
       return;
     }
     setError(""); // Limpiar errores si no hay problemas
     generatePDF(pagos);
+  };
+
+  const handleEliminarPago = async (id) => {
+    try {
+      const res = await fetch("/api/pagos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (res.ok) {
+        // Recargar la lista de pagos después de eliminar
+        cargarPagos();
+      } else {
+        throw new Error("Error al eliminar el pago");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleFiltroChange = (e) => {
@@ -79,10 +114,11 @@ export default function Pagos() {
     cargarPagos();
   };
 
-  // Función para formatear la fecha y hora
   const formatFechaHora = (fecha) => {
     const date = new Date(fecha);
+    // Asegúrate de que la fecha se maneje en la zona horaria local
     return date.toLocaleString("es-ES", {
+      timeZone: "America/Argentina/Buenos_Aires", // Ajusta la zona horaria según tu ubicación
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -115,8 +151,24 @@ export default function Pagos() {
             onChange={handleFiltroChange}
             className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
+          <input
+            type="date"
+            name="fechaInicio"
+            placeholder="Fecha de inicio"
+            value={filtroFecha.fechaInicio}
+            onChange={handleFiltroFechaChange}
+            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <input
+            type="date"
+            name="fechaFin"
+            placeholder="Fecha de fin"
+            value={filtroFecha.fechaFin}
+            onChange={handleFiltroFechaChange}
+            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
           <button
-            onClick={handleBuscar}
+            onClick={handleBuscar && handleBuscarPorFecha}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
           >
             Buscar
@@ -134,15 +186,20 @@ export default function Pagos() {
 
       {pagos.length > 0 ? (
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Lista de Pagos</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Lista de Pagos
+          </h2>
           <div className="bg-white shadow-md rounded p-4">
             {pagos.map((pago) => (
-              <div
-                key={pago.id}
-                className="border-b py-4 space-y-2"
-              >
+              <div key={pago.id} className="border-b py-4 space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">{pago.nombre_apellido}</span>
+                  <button
+                    onClick={() => handleEliminarPago(pago.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    X
+                  </button>
                   <span className="text-sm text-gray-600">DNI: {pago.dni}</span>
                 </div>
                 <div className="text-sm text-gray-600">
