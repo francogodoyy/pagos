@@ -6,11 +6,11 @@ import { generatePDF } from "@/utils/pdf";
 import { useRouter } from "next/navigation";
 
 export default function Pagos() {
-  const {data: session, status } = useSession();
-  const router = useRouter(); 
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [filtro, setFiltro] = useState({ dni: "", nombre_apellido: "" });
   const [pagos, setPagos] = useState([]);
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
 
   const handleNuevoPago = () => {
     router.push("/pagos/nuevo-pago");
@@ -34,7 +34,8 @@ export default function Pagos() {
     try {
       const params = new URLSearchParams();
       if (filtro.dni) params.append("dni", filtro.dni);
-      if (filtro.nombre_apellido) params.append("nombre_apellido", filtro.nombre_apellido);
+      if (filtro.nombre_apellido)
+        params.append("nombre_apellido", filtro.nombre_apellido);
 
       const res = await fetch(`/api/pagos?${params.toString()}`);
 
@@ -49,7 +50,6 @@ export default function Pagos() {
       setError(err.message);
     }
   };
-  
 
   useEffect(() => {
     cargarPagos();
@@ -76,7 +76,7 @@ export default function Pagos() {
       return;
     }
 
-    setError("");  //Clean errors if the validation is success
+    setError(""); //Clean errors if the validation is success
     cargarPagos();
   };
 
@@ -87,55 +87,74 @@ export default function Pagos() {
       </h1>
       <div className="flex justify-center mb-6">
         <div className="flex space-x-4">
-        <input
-          type="text"
-          name="nombre_apellido"
-          placeholder="Filtrar por Nombre o Apellido"
-          value={filtro.nombre_apellido}
-          onChange={handleFiltroChange}
-          className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-        <input
-          type="text"
-          name="dni"
-          placeholder="Filtrar por DNI"
-          value={filtro.dni}
-          onChange={handleFiltroChange}
-          className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        />
-        <button 
-        onClick={handleBuscar}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
-        >
-          Buscar
-        </button>
-        <button
-          onClick={handleNuevoPago}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+          <input
+            type="text"
+            name="nombre_apellido"
+            placeholder="Filtrar por Nombre o Apellido"
+            value={filtro.nombre_apellido}
+            onChange={handleFiltroChange}
+            className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <input
+            type="text"
+            name="dni"
+            placeholder="Filtrar por DNI"
+            value={filtro.dni}
+            onChange={handleFiltroChange}
+            className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <button
+            onClick={handleBuscar}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
           >
-        Registrar Nuevo Pago
-        </button>
-      </div>
+            Buscar
+          </button>
+          <button
+            onClick={handleNuevoPago}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
+          >
+            Registrar Nuevo Pago
+          </button>
+        </div>
       </div>
 
       {pagos.length > 0 ? (
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Lista de Pagos</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Lista de Pagos
+          </h2>
           <ul className="bg-white shadow-md rounded p-4">
             {pagos.map((pago) => (
               <li
-              key={pago.id}
-              className="flex justify-between items-center border-b py-2"
+                key={pago.id}
+                className="flex justify-between items-center border-b py-2"
               >
-              <span>{pago.nombre_apellido} - {pago.dni} </span>
-              <span>{pago.fecha_pago}</span>
-              <span>{pago.descripcion}</span>
-              <span>${pago.monto}</span>
+                <div>
+                  <span>
+                    {pago.nombre_apellido} - {pago.dni}
+                  </span>
+                  <p className="text-sm text-gray-600">Correo: {pago.correo}</p>
+                  <p className="text-sm text-gray-600">
+                    Localidad: {pago.localidad}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Teléfono: {pago.telefono}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Dirección: {pago.direccion}
+                  </p>
+                </div>
+                <div>
+                  <span>{pago.fecha_pago}</span>
+                  <p>{pago.descripcion}</p>
+                  <p>${pago.monto}</p>
+                </div>
               </li>
             ))}
           </ul>
-          <button onClick={handlePDF}
-          className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          <button
+            onClick={handlePDF}
+            className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           >
             Generar PDF
           </button>

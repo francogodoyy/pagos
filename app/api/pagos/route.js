@@ -1,6 +1,5 @@
 import { db } from "@/utils/db";
-
-import Joi from "joi"
+import Joi from "joi";
 
 const pagoSchema = Joi.object({
   nombre_apellido: Joi.string().max(100).required(),
@@ -8,7 +7,10 @@ const pagoSchema = Joi.object({
   monto: Joi.number().min(0).required(),
   fecha_pago: Joi.date().iso().required(),
   descripcion: Joi.string().max(255).optional(),
-
+  correo: Joi.string().email().required(), // Nuevo campo
+  localidad: Joi.string().max(100).required(), // Nuevo campo
+  telefono: Joi.string().max(20).required(), // Nuevo campo
+  direccion: Joi.string().max(255).required(), // Nuevo campo
 });
 
 export async function POST(req) {
@@ -20,16 +22,16 @@ export async function POST(req) {
       return new Response(`Error de validación: ${error.message}`, { status: 400 });
     }
 
-    const { dni, nombre_apellido, monto, fecha_pago, descripcion } = value;
+    const { dni, nombre_apellido, monto, fecha_pago, descripcion, correo, localidad, telefono, direccion } = value;
 
-    //Insert in the database
+    // Insertar en la base de datos
     await db.query(
-      "INSERT INTO pagos (nombre_apellido, dni, monto, fecha_pago, descripcion) VALUES (?, ?, ?, ?, ?) ",
-      [nombre_apellido, dni, monto, fecha_pago, descripcion]
+      "INSERT INTO pagos (nombre_apellido, dni, monto, fecha_pago, descripcion, correo, localidad, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [nombre_apellido, dni, monto, fecha_pago, descripcion, correo, localidad, telefono, direccion]
     );
-    return new Response("Pago registrado con éxito", {status: 201});
+    return new Response("Pago registrado con éxito", { status: 201 });
   } catch (error) {
-    return new Response("Error interno en el servidor", {status: 500});
+    return new Response("Error interno en el servidor", { status: 500 });
   }
 }
 
@@ -56,5 +58,3 @@ export async function GET(req) {
     return new Response("Error al obtener los pagos", { status: 500 });
   }
 }
-
-  
