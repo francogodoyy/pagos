@@ -16,14 +16,12 @@ export default function Pagos() {
     router.push("/pagos/nuevo-pago");
   };
 
-  const [filtroFecha, setFiltroFecha] = useState({
-    fechaInicio: "",
-    fechaFin: "",
-  });
+  const [filtroFecha, setFiltroFecha] = useState("");
+
   const handleFiltroFechaChange = (e) => {
-    const { name, value } = e.target;
-    setFiltroFecha({ ...filtroFecha, [name]: value });
+    setFiltroFecha(e.target.value);
   };
+
   const handleBuscarPorFecha = () => {
     cargarPagos();
   };
@@ -48,9 +46,7 @@ export default function Pagos() {
       if (filtro.dni) params.append("dni", filtro.dni);
       if (filtro.nombre_apellido)
         params.append("nombre_apellido", filtro.nombre_apellido);
-      if (filtroFecha.fechaInicio)
-        params.append("fechaInicio", filtroFecha.fechaInicio);
-      if (filtroFecha.fechaFin) params.append("fechaFin", filtroFecha.fechaFin);
+      if (filtroFecha) params.append("fechaInicio", filtroFecha);
 
       const res = await fetch(`/api/pagos?${params.toString()}`);
 
@@ -116,9 +112,11 @@ export default function Pagos() {
 
   const formatFechaHora = (fecha) => {
     const date = new Date(fecha);
-    // Asegúrate de que la fecha se maneje en la zona horaria local
-    return date.toLocaleString("es-ES", {
-      timeZone: "America/Argentina/Buenos_Aires", // Ajusta la zona horaria según tu ubicación
+    // Ajusta la fecha a la zona horaria local
+    const offset = date.getTimezoneOffset() * 60000; // Convertir offset a milisegundos
+    const localDate = new Date(date.getTime() - offset);
+
+    return localDate.toLocaleString("es-ES", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -154,21 +152,12 @@ export default function Pagos() {
           <input
             type="date"
             name="fechaInicio"
-            placeholder="Fecha de inicio"
-            value={filtroFecha.fechaInicio}
-            onChange={handleFiltroFechaChange}
-            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-          <input
-            type="date"
-            name="fechaFin"
-            placeholder="Fecha de fin"
-            value={filtroFecha.fechaFin}
+            value={filtroFecha}
             onChange={handleFiltroFechaChange}
             className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
           <button
-            onClick={handleBuscar && handleBuscarPorFecha}
+            onClick={handleBuscar || handleBuscarPorFecha}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
           >
             Buscar

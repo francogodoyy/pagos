@@ -65,7 +65,7 @@ export async function GET(req) {
   const dni = searchParams.get("dni");
   const nombre_apellido = searchParams.get("nombre_apellido");
   const fechaInicio = searchParams.get("fechaInicio");
-  const fechaFin = searchParams.get("fechaFin");
+  
 
   let query = "SELECT * FROM pagos";
   const params = [];
@@ -78,10 +78,9 @@ export async function GET(req) {
     params.push(`%${nombre_apellido}%`);
   }
 
-  if (fechaInicio && fechaFin) {
-    query +=
-      (params.length > 0 ? " AND" : " WHERE") + " fecha_pago BETWEEN ? AND ?";
-    params.push(fechaInicio, fechaFin);
+  if (fechaInicio) {
+    query += (params.length > 0 ? " AND" : " WHERE") + " DATE(fecha_pago) = ?";
+    params.push(fechaInicio);
   }
 
   try {
