@@ -34,8 +34,7 @@ export default function Pagos() {
     try {
       const params = new URLSearchParams();
       if (filtro.dni) params.append("dni", filtro.dni);
-      if (filtro.nombre_apellido)
-        params.append("nombre_apellido", filtro.nombre_apellido);
+      if (filtro.nombre_apellido) params.append("nombre_apellido", filtro.nombre_apellido);
 
       const res = await fetch(`/api/pagos?${params.toString()}`);
 
@@ -60,7 +59,7 @@ export default function Pagos() {
       setError("No hay pagos para generar un PDF.");
       return;
     }
-    setError(""); //Clean errors if no any problems
+    setError(""); // Limpiar errores si no hay problemas
     generatePDF(pagos);
   };
 
@@ -70,14 +69,27 @@ export default function Pagos() {
   };
 
   const handleBuscar = () => {
-    //validation before carry out the search
+    // Validación antes de realizar la búsqueda
     if (filtro.dni && !/^\d{8}$/.test(filtro.dni)) {
       setError("El DNI debe tener 8 dígitos.");
       return;
     }
 
-    setError(""); //Clean errors if the validation is success
+    setError(""); // Limpiar errores si la validación es exitosa
     cargarPagos();
+  };
+
+  // Función para formatear la fecha y hora
+  const formatFechaHora = (fecha) => {
+    const date = new Date(fecha);
+    return date.toLocaleString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
 
   return (
@@ -93,7 +105,7 @@ export default function Pagos() {
             placeholder="Filtrar por Nombre o Apellido"
             value={filtro.nombre_apellido}
             onChange={handleFiltroChange}
-            className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
           <input
             type="text"
@@ -101,7 +113,7 @@ export default function Pagos() {
             placeholder="Filtrar por DNI"
             value={filtro.dni}
             onChange={handleFiltroChange}
-            className="shadow appeareance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
           <button
             onClick={handleBuscar}
@@ -118,40 +130,37 @@ export default function Pagos() {
         </div>
       </div>
 
+      {error && <p className="text-center text-red-500 mb-4">{error}</p>}
+
       {pagos.length > 0 ? (
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">
-            Lista de Pagos
-          </h2>
-          <ul className="bg-white shadow-md rounded p-4">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Lista de Pagos</h2>
+          <div className="bg-white shadow-md rounded p-4">
             {pagos.map((pago) => (
-              <li
+              <div
                 key={pago.id}
-                className="flex justify-between items-center border-b py-2"
+                className="border-b py-4 space-y-2"
               >
-                <div>
-                  <span>
-                    {pago.nombre_apellido} - {pago.dni}
-                  </span>
-                  <p className="text-sm text-gray-600">Correo: {pago.correo}</p>
-                  <p className="text-sm text-gray-600">
-                    Localidad: {pago.localidad}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Teléfono: {pago.telefono}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Dirección: {pago.direccion}
-                  </p>
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">{pago.nombre_apellido}</span>
+                  <span className="text-sm text-gray-600">DNI: {pago.dni}</span>
                 </div>
-                <div>
-                  <span>{pago.fecha_pago}</span>
-                  <p>{pago.descripcion}</p>
-                  <p>${pago.monto}</p>
+                <div className="text-sm text-gray-600">
+                  <p>Correo: {pago.correo}</p>
+                  <p>Localidad: {pago.localidad}</p>
+                  <p>Teléfono: {pago.telefono}</p>
+                  <p>Dirección: {pago.direccion}</p>
                 </div>
-              </li>
+                <div className="flex justify-between items-center text-sm text-gray-600">
+                  <span>Fecha y Hora: {formatFechaHora(pago.fecha_pago)}</span>
+                  <span>Monto: ${pago.monto}</span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p>Descripción: {pago.descripcion}</p>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
           <button
             onClick={handlePDF}
             className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
