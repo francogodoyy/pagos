@@ -2,8 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { handleGeneratePDF } from "@/utils/pdf";
 import { useRouter } from "next/navigation";
+import { generatePDF } from "@/utils/pdf";
 
 export default function Pagos() {
   const { data: session, status } = useSession();
@@ -72,8 +72,13 @@ export default function Pagos() {
       return;
     }
     setError(""); // Limpiar errores si no hay problemas
-    handleGeneratePDF(pagos);
+    console.log("Llamando a generatePDF...");
+    generatePDF(pagos);
   };
+
+  useEffect(() => {
+    console.log(generatePDF); 
+  }, []);
 
   const handleEliminarPago = async (id) => {
     try {
@@ -208,7 +213,7 @@ export default function Pagos() {
             ))}
           </div>
           <button
-            onClick={handleGeneratePDF}
+            onClick={generatePDF}
             className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           >
             Generar PDF
