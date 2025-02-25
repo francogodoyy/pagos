@@ -66,15 +66,15 @@ export default function Pagos() {
     cargarPagos();
   }, []);
 
-  const generatePDF = () => {
-    if (pagos.length === 0) {
-      setError("No hay pagos para generar un PDF.");
-      return;
+  const handleGeneratePDF = () => {
+    if (!Array.isArray(pagos) || pagos.length === 0) {
+        setError("No hay pagos para generar un PDF.");
+        console.error("Error: pagos no es un array válido", pagos);
+        return;
     }
-    setError(""); // Limpiar errores si no hay problemas
-    console.log("Llamando a generatePDF...");
+    setError("");
     generatePDF(pagos);
-  };
+};
 
 
   const handleEliminarPago = async (id) => {
@@ -210,7 +210,7 @@ export default function Pagos() {
             ))}
           </div>
           <button
-            onClick={generatePDF}
+            onClick={handleGeneratePDF}
             className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           >
             Generar PDF
