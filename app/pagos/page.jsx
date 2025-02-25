@@ -130,9 +130,15 @@ export default function Pagos() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      {/* Logo centrado arriba del título */}
+      <div className="flex justify-center mb-4">
+        <img src="/shine.jpeg" alt="Shine Logo" className="w-24 h-24 object-contain" />
+      </div>
+  
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Historial de Pagos
       </h1>
+  
       <div className="flex justify-center mb-6">
         <div className="flex space-x-4">
           <input
@@ -172,9 +178,9 @@ export default function Pagos() {
           </button>
         </div>
       </div>
-
+  
       {error && <p className="text-center text-red-500 mb-4">{error}</p>}
-
+  
       {pagos.length > 0 ? (
         <div className="max-w-4xl mx-auto">
           <h2 className="text-xl font-bold mb-4 text-gray-800">
@@ -221,4 +227,5 @@ export default function Pagos() {
       )}
     </div>
   );
+  
 }
