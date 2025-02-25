@@ -42,7 +42,7 @@ export default function Login() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/shine.jpeg" alt="Logo" className="w-20 h-20 object-contain" />
+          <img src="/shine.jpeg" alt="Logo" className="w-40 h-20 object-contain" />
         </div>
   
         <h1 className="text-2xl font-semibold text-center text-gray-700 mb-6">
