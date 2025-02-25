@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { generatePDF } from "@/utils/pdf";
+import { handleGeneratePDF } from "@/utils/pdf";
 import { useRouter } from "next/navigation";
 
 export default function Pagos() {
@@ -72,7 +72,7 @@ export default function Pagos() {
       return;
     }
     setError(""); // Limpiar errores si no hay problemas
-    generatePDF(pagos);
+    handleGeneratePDF(pagos);
   };
 
   const handleEliminarPago = async (id) => {

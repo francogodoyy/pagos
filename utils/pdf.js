@@ -1,5 +1,5 @@
 // En /utils/pdf.js
-export const generatePDF = (pagos) => {
+export const handleGeneratePDF = (pagos) => {
     const doc = new jsPDF();
     pagos.forEach((pago, index) => {
       const y = 10 + index * 40;
