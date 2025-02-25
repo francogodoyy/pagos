@@ -66,7 +66,7 @@ export default function Pagos() {
     cargarPagos();
   }, []);
 
-  const generatePDF = () => {
+  const handleGeneratePDF = () => {
     if (pagos.length === 0) {
       setError("No hay pagos para generar un PDF.");
       return;
@@ -208,7 +208,7 @@ export default function Pagos() {
             ))}
           </div>
           <button
-            onClick={generatePDF}
+            onClick={handleGeneratePDF}
             className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           >
             Generar PDF
