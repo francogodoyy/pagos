@@ -66,7 +66,7 @@ export default function Pagos() {
     cargarPagos();
   }, []);
 
-  const handleGeneratePDF = () => {
+  const generatePDF = () => {
     if (pagos.length === 0) {
       setError("No hay pagos para generar un PDF.");
       return;
@@ -76,9 +76,6 @@ export default function Pagos() {
     generatePDF(pagos);
   };
 
-  useEffect(() => {
-    console.log(generatePDF); 
-  }, []);
 
   const handleEliminarPago = async (id) => {
     try {

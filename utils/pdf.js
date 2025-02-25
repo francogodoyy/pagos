@@ -1,5 +1,5 @@
 // En /utils/pdf.js
-import jsPDF from "jspdf";
+import {jsPDF} from "jspdf";
 
 export const generatePDF = (pagos) => {
     const doc = new jsPDF();
