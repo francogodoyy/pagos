@@ -1,4 +1,6 @@
 // En /utils/pdf.js
+import jsPDF from "jspdf";
+
 export const generatePDF = (pagos) => {
     const doc = new jsPDF();
     pagos.forEach((pago, index) => {
@@ -11,5 +13,6 @@ export const generatePDF = (pagos) => {
       doc.text(`Dirección: ${pago.direccion}`, 10, y + 50);
       doc.text(`Monto: $${pago.monto}`, 10, y + 60);
     });
+    
     doc.save("pagos.pdf");
   };
