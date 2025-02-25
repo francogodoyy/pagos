@@ -68,14 +68,13 @@ export default function Pagos() {
 
   const handleGeneratePDF = () => {
     if (!Array.isArray(pagos) || pagos.length === 0) {
-        setError("No hay pagos para generar un PDF.");
-        console.error("Error: pagos no es un array válido", pagos);
-        return;
+      setError("No hay pagos para generar un PDF.");
+      console.error("Error: pagos no es un array válido", pagos);
+      return;
     }
     setError("");
     generatePDF(pagos);
-};
-
+  };
 
   const handleEliminarPago = async (id) => {
     try {
@@ -129,16 +128,20 @@ export default function Pagos() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-200 to-pink-300">
       {/* Logo centrado arriba del título */}
       <div className="flex justify-center mb-4">
-        <img src="/shine.jpeg" alt="Shine Logo" className="w-24 h-24 object-contain" />
+        <img
+          src="/shine.jpeg"
+          alt="Shine Logo"
+          className="w-24 h-24 object-contain"
+        />
       </div>
-  
+
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Historial de Pagos
       </h1>
-  
+
       <div className="flex justify-center mb-6">
         <div className="flex space-x-4">
           <input
@@ -178,15 +181,15 @@ export default function Pagos() {
           </button>
         </div>
       </div>
-  
+
       {error && <p className="text-center text-red-500 mb-4">{error}</p>}
-  
+
       {pagos.length > 0 ? (
         <div className="max-w-4xl mx-auto">
           <h2 className="text-xl font-bold mb-4 text-gray-800">
             Lista de Pagos
           </h2>
-          <div className="bg-white shadow-md rounded p-4">
+          <div className="bg-white shadow-lg rounded-lg p-6">
             {pagos.map((pago) => (
               <div key={pago.id} className="border-b py-4 space-y-2">
                 <div className="flex justify-between items-center">
@@ -207,7 +210,9 @@ export default function Pagos() {
                 </div>
                 <div className="flex justify-between items-center text-sm text-gray-600">
                   <span>Fecha y Hora: {formatFechaHora(pago.fecha_pago)}</span>
-                  <span>Monto: ${pago.monto}</span>
+                  <span className="font-semibold text-gray-800">
+                    Monto: ${pago.monto}
+                  </span>
                 </div>
                 <div className="text-sm text-gray-600">
                   <p>Descripción: {pago.descripcion}</p>
@@ -227,5 +232,4 @@ export default function Pagos() {
       )}
     </div>
   );
-  
 }
