@@ -39,16 +39,18 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 to-pink-300 p-6">
-      
       <div className="flex justify-center mb-4">
-        <img src="/shine.jpeg" alt="Logo Shine" className="w-40 h-24 object-contain" />
+        <img
+          src="/shine.jpeg"
+          alt="Logo Shine"
+          className="w-40 h-24 object-contain"
+        />
       </div>
-  
+
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Historial de Pagos
       </h1>
-  
-     
+
       <div className="flex justify-center mb-6">
         <div className="flex space-x-4 bg-white p-4 rounded-xl shadow-md">
           <input
@@ -88,10 +90,10 @@ export default function Login() {
           </button>
         </div>
       </div>
-  
+
       {/* Mensaje de error */}
       {error && <p className="text-center text-red-500 mb-4">{error}</p>}
-  
+
       {/* Lista de Pagos */}
       {pagos.length > 0 ? (
         <div className="max-w-4xl mx-auto">
@@ -119,7 +121,9 @@ export default function Login() {
                 </div>
                 <div className="flex justify-between items-center text-sm text-gray-600">
                   <span>Fecha y Hora: {formatFechaHora(pago.fecha_pago)}</span>
-                  <span className="font-bold text-gray-700">Monto: ${pago.monto}</span>
+                  <span className="font-bold text-gray-700">
+                    Monto: ${pago.monto}
+                  </span>
                 </div>
                 <div className="text-sm text-gray-600">
                   <p>Descripción: {pago.descripcion}</p>
@@ -127,7 +131,7 @@ export default function Login() {
               </div>
             ))}
           </div>
-  
+
           {/* Botón para generar PDF */}
           <button
             onClick={handleGeneratePDF}
@@ -140,5 +144,5 @@ export default function Login() {
         <p className="text-center text-gray-700">No se encontraron pagos.</p>
       )}
     </div>
-  );  
+  );
 }
