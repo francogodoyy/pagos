@@ -128,7 +128,7 @@ export default function Pagos() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-200 to-pink-300">
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 to-pink-300">
       {/* Logo centrado arriba del título */}
       <div className="flex justify-center mb-4">
         <img

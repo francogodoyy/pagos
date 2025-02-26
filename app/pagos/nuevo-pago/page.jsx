@@ -56,7 +56,7 @@ export default function NuevoPago() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-200 to-pink-300">
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 to-pink-300">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-lg bg-white rounded-lg shadow-md p-8 space-y-6"
