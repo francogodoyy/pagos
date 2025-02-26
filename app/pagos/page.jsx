@@ -132,7 +132,7 @@ export default function Pagos() {
       {/* Logo centrado arriba del título */}
       <div className="flex justify-center mb-4">
         <img
-          src="/shine.jpeg"
+          src="/shinee.png"
           alt="Shine Logo"
           className="w-24 h-24 object-contain"
         />
