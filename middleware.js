@@ -15,19 +15,10 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 
-  // Si el usuario ya está autenticado y trata de acceder al login, redirigir a /pagos
-  if (token && isLoginRoute) {
-    return NextResponse.redirect(new URL("/pagos", req.url));
-  }
-
-  // ✅ NUEVA CONDICIÓN: Si está en la raíz "/", redirigir a "/admin/login"
-  if (isRoot) {
-    return NextResponse.redirect(new URL("/admin/login", req.url));
-  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin/:path*", "/pagos/:path*"], // Agregamos "/" en el matcher
+  matcher: ["/admin/:path*", "/pagos/:path*"], 
 };
