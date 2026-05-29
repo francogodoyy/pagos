@@ -99,15 +99,15 @@ Abrir [http://localhost:3000](http://localhost:3000) en el navegador.
 
 ---
 
-## 🗄️ Base de datos
+##  Base de datos
 
 El proyecto utiliza **MySQL**. Asegurate de tener una instancia corriendo y crear la base de datos antes de iniciar el servidor.
 
-> ⚠️ El schema de la base de datos será agregado próximamente.
+>  El schema de la base de datos será agregado próximamente.
 
 ---
 
-## 📦 Scripts disponibles
+##  Scripts disponibles
 
 ```
 npm run dev      # Servidor de desarrollo
@@ -118,13 +118,13 @@ npm run lint     # Linter
 
 ---
 
-## 👤 Autor
+##  Autor
 
 **Franco Godoy**
 [GitHub](https://github.com/francogodoyy)
 
 ---
 
-## 📝 Licencia
+##  Licencia
 
 Este proyecto es de uso privado / educativo.
