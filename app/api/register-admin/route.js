@@ -36,7 +36,7 @@ export async function POST(req) {
 }
 
 //función para limitar admins
-const [rows] = await db.query("SELECT COUNT(*) as total from USUARIOS");
+const [rows] = await db.query("SELECT COUNT(*) as total from usuarios");
 const total = rows[0].total;
 
 if (total >=2 ){
