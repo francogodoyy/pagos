@@ -35,10 +35,3 @@ export async function POST(req) {
   return new Response("Admin registrado con éxito", { status: 201 });
 }
 
-//función para limitar admins
-const [rows] = await db.query("SELECT COUNT(*) as total from usuarios");
-const total = rows[0].total;
-
-if (total >=2 ){
-  return new Response("Límite de administradores alcazado", { status: 403 });
-}
