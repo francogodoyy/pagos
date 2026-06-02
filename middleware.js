@@ -7,8 +7,8 @@ export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
   const isLoginRoute = pathname === "/admin/login";
-  const isProtectedRoute = pathname.startsWith("/pagos");
-  const isRoot = pathname === "/"; // Detectamos la raíz
+  const isProtectedRoute = pathname.startsWith("/pagos") || pathname.startsWith("/nuevo-pago");
+  const isRoot = pathname === "/"; // 
 
   // Si el usuario no está autenticado y trata de acceder a rutas protegidas
   if (!token && isProtectedRoute) {
@@ -20,5 +20,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/pagos/:path*"], 
+  matcher: ["/admin/:path*", "/pagos/:path*", "/nuevo-pago"], 
 };

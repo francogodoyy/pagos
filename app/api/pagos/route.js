@@ -1,5 +1,7 @@
 import { db } from "@/utils/db";
 import Joi from "joi";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const pagoSchema = Joi.object({
   nombre_apellido: Joi.string().max(100).required(),
@@ -10,15 +12,22 @@ const pagoSchema = Joi.object({
   monto: Joi.number().min(0).required(),
   fecha_pago: Joi.date().iso().required(),
   descripcion: Joi.string().max(255).optional(),
-  correo: Joi.string().email().required(), // Nuevo campo
-  localidad: Joi.string().max(100).required(), // Nuevo campo
-  telefono: Joi.string().max(20).required(), // Nuevo campo
-  direccion: Joi.string().max(255).required(), // Nuevo campo
+  correo: Joi.string().email().required(),
+  localidad: Joi.string().max(100).required(),
+  telefono: Joi.string().max(20).required(),
+  direccion: Joi.string().max(255).required(),
 });
 
 export async function POST(req) {
+  // Verificar sesión
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response("No autorizado", { status: 401 });
+  }
+
   try {
     const data = await req.json();
+    console.log("Data recibida:", data);
 
     const { error, value } = pagoSchema.validate(data);
     if (error) {
@@ -39,7 +48,6 @@ export async function POST(req) {
       direccion,
     } = value;
 
-    // Insertar en la base de datos
     await db.query(
       "INSERT INTO pagos (nombre_apellido, dni, monto, fecha_pago, descripcion, correo, localidad, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
@@ -61,11 +69,18 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
+  // Verificar sesión
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response("No autorizado", { status: 401 });
+  }
+
   const { searchParams } = new URL(req.url);
   const dni = searchParams.get("dni");
   const nombre_apellido = searchParams.get("nombre_apellido");
   const fechaInicio = searchParams.get("fechaInicio");
-  
+  const limit = parseInt(searchParams.get("limit")) || 50;
+  const offset = parseInt(searchParams.get("offset")) || 0;
 
   let query = "SELECT * FROM pagos";
   const params = [];
@@ -83,6 +98,10 @@ export async function GET(req) {
     params.push(fechaInicio);
   }
 
+  // Paginación
+  query += " LIMIT ? OFFSET ?";
+  params.push(limit, offset);
+
   try {
     const [rows] = await db.query(query, params);
     return new Response(JSON.stringify(rows), { status: 200 });
@@ -92,6 +111,12 @@ export async function GET(req) {
 }
 
 export async function DELETE(req) {
+  // Verificar sesión
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response("No autorizado", { status: 401 });
+  }
+
   try {
     const { id } = await req.json();
 
@@ -99,8 +124,8 @@ export async function DELETE(req) {
       return new Response("ID de pago no proporcionado", { status: 400 });
     }
 
-    // Eliminar el pago de la base de datos
-    await db.query("DELETE FROM pagos WHERE id = ?", [id]);
+    // 
+    await db.query("DELETE FROM pagos WHERE id_pagos = ?", [id]);
 
     return new Response("Pago eliminado con éxito", { status: 200 });
   } catch (error) {

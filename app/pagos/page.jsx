@@ -3,95 +3,55 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { generatePDF } from "@/utils/pdf";
 
 export default function Pagos() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [filtro, setFiltro] = useState({ dni: "", nombre_apellido: "" });
+  const [filtroFecha, setFiltroFecha] = useState("");
   const [pagos, setPagos] = useState([]);
   const [error, setError] = useState("");
-
-  const handleNuevoPago = () => {
-    router.push("/pagos/nuevo-pago");
-  };
-
-  const [filtroFecha, setFiltroFecha] = useState("");
-
-  const handleFiltroFechaChange = (e) => {
-    setFiltroFecha(e.target.value);
-  };
-
-  const handleBuscarPorFecha = () => {
-    cargarPagos();
-  };
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
-
-    if (!session) {
-      router.push("/admin/login");
-    } else if (session.user.role !== "admin") {
+    if (!session || session.user.role !== "admin") {
       router.push("/admin/login");
     }
   }, [session, status, router]);
-
-  if (status === "loading" || !session) {
-    return <p>Cargando...</p>;
-  }
-
-  const cargarPagos = async () => {
-    try {
-      const params = new URLSearchParams();
-      if (filtro.dni) params.append("dni", filtro.dni);
-      if (filtro.nombre_apellido)
-        params.append("nombre_apellido", filtro.nombre_apellido);
-      if (filtroFecha) params.append("fechaInicio", filtroFecha);
-
-      const res = await fetch(`/api/pagos?${params.toString()}`);
-
-      if (res.ok) {
-        const data = await res.json();
-        setPagos(data);
-        setError(""); // Limpiar errores si todo va bien
-      } else {
-        throw new Error("Error al cargar los pagos.");
-      }
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
   useEffect(() => {
     cargarPagos();
   }, []);
 
-  const handleGeneratePDF = () => {
-    if (!Array.isArray(pagos) || pagos.length === 0) {
-      setError("No hay pagos para generar un PDF.");
-      console.error("Error: pagos no es un array válido", pagos);
-      return;
-    }
-    setError("");
-    generatePDF(pagos);
-  };
+  if (status === "loading" || !session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 to-pink-300">
+        <p className="text-gray-600">Cargando...</p>
+      </div>
+    );
+  }
 
-  const handleEliminarPago = async (id) => {
+  const cargarPagos = async () => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/pagos", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
+      const params = new URLSearchParams();
+      if (filtro.dni) params.append("dni", filtro.dni);
+      if (filtro.nombre_apellido) params.append("nombre_apellido", filtro.nombre_apellido);
+      if (filtroFecha) params.append("fechaInicio", filtroFecha);
 
+      const res = await fetch(`/api/pagos?${params.toString()}`);
       if (res.ok) {
-        // Recargar la lista de pagos después de eliminar
-        cargarPagos();
+        const data = await res.json();
+        setPagos(data);
+        setError("");
       } else {
-        throw new Error("Error al eliminar el pago");
+        throw new Error("Error al cargar los pagos.");
       }
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,135 +61,146 @@ export default function Pagos() {
   };
 
   const handleBuscar = () => {
-    // Validación antes de realizar la búsqueda
     if (filtro.dni && !/^\d{8}$/.test(filtro.dni)) {
       setError("El DNI debe tener 8 dígitos.");
       return;
     }
-
-    setError(""); // Limpiar errores si la validación es exitosa
+    setError("");
     cargarPagos();
   };
 
-  const formatFechaHora = (fecha) => {
-    const date = new Date(fecha);
-    // Ajusta la fecha a la zona horaria local
-    const offset = date.getTimezoneOffset() * 60000; // Convertir offset a milisegundos
-    const localDate = new Date(date.getTime() - offset);
+  const handleLimpiar = () => {
+    setFiltro({ dni: "", nombre_apellido: "" });
+    setFiltroFecha("");
+    setError("");
+    setTimeout(() => cargarPagos(), 0);
+  };
 
-    return localDate.toLocaleString("es-ES", {
+  const formatFecha = (fecha) => {
+    const date = new Date(fecha);
+    const offset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
     });
+  };
+
+  const formatMonto = (monto) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      minimumFractionDigits: 0,
+    }).format(monto);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 to-pink-300">
-      {/* Logo centrado arriba del título */}
-      <div className="flex justify-center mb-4">
-        <img
-          src="/shinee.png"
-          alt="Shine Logo"
-          className="w-24 h-24 object-contain"
-        />
-      </div>
+      <div className="max-w-5xl mx-auto px-4 py-8">
 
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Historial de Pagos
-      </h1>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <img src="/shinee.png" alt="Shine Logo" className="w-12 h-12 object-contain" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Historial de pagos</h1>
+              <p className="text-sm text-gray-500">{session.user.email}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => router.push("/nuevo-pago")}
+            className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+          >
+            + Nuevo pago
+          </button>
+        </div>
 
-      <div className="flex justify-center mb-6">
-        <div className="flex space-x-4">
+        {/* Filtros */}
+        <div className="bg-white rounded-xl p-4 mb-4 shadow-sm flex flex-wrap gap-3 items-center">
           <input
             type="text"
             name="nombre_apellido"
-            placeholder="Filtrar por Nombre o Apellido"
+            placeholder="Buscar por nombre..."
             value={filtro.nombre_apellido}
             onChange={handleFiltroChange}
-            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="flex-1 min-w-[160px] border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-300"
           />
           <input
             type="text"
             name="dni"
-            placeholder="Filtrar por DNI"
+            placeholder="Buscar por DNI..."
             value={filtro.dni}
             onChange={handleFiltroChange}
-            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="flex-1 min-w-[140px] border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-300"
           />
           <input
             type="date"
-            name="fechaInicio"
             value={filtroFecha}
-            onChange={handleFiltroFechaChange}
-            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            onChange={(e) => setFiltroFecha(e.target.value)}
+            className="border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-300"
           />
           <button
-            onClick={handleBuscar || handleBuscarPorFecha}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
+            onClick={handleBuscar}
+            className="bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-200"
           >
             Buscar
           </button>
-          <button
-            onClick={handleNuevoPago}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
-          >
-            Registrar Nuevo Pago
-          </button>
+          {(filtro.dni || filtro.nombre_apellido || filtroFecha) && (
+            <button
+              onClick={handleLimpiar}
+              className="text-gray-400 hover:text-gray-600 text-sm underline"
+            >
+              Limpiar
+            </button>
+          )}
         </div>
-      </div>
 
-      {error && <p className="text-center text-red-500 mb-4">{error}</p>}
-
-      {pagos.length > 0 ? (
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">
-            Lista de Pagos
-          </h2>
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            {pagos.map((pago) => (
-              <div key={pago.id} className="border-b py-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold">{pago.nombre_apellido}</span>
-                  <button
-                    onClick={() => handleEliminarPago(pago.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    X
-                  </button>
-                  <span className="text-sm text-gray-600">DNI: {pago.dni}</span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <p>Correo: {pago.correo}</p>
-                  <p>Localidad: {pago.localidad}</p>
-                  <p>Teléfono: {pago.telefono}</p>
-                  <p>Dirección: {pago.direccion}</p>
-                </div>
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>Fecha y Hora: {formatFechaHora(pago.fecha_pago)}</span>
-                  <span className="font-semibold text-gray-800">
-                    Monto: ${pago.monto}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <p>Descripción: {pago.descripcion}</p>
-                </div>
-              </div>
-            ))}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+            {error}
           </div>
-          <button
-            onClick={handleGeneratePDF}
-            className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-          >
-            Generar PDF
-          </button>
+        )}
+
+        {/* Tabla */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {/* Encabezado tabla */}
+          <div className="grid grid-cols-[2fr_1.2fr_1fr_1.2fr_40px] gap-4 px-6 py-3 border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wide">
+            <span>Nombre</span>
+            <span>DNI</span>
+            <span>Fecha</span>
+            <span>Monto</span>
+            <span></span>
+          </div>
+
+          {/* Filas */}
+          {loading ? (
+            <div className="px-6 py-12 text-center text-sm text-gray-400">Cargando pagos...</div>
+          ) : pagos.length === 0 ? (
+            <div className="px-6 py-12 text-center text-sm text-gray-400">No se encontraron pagos.</div>
+          ) : (
+            pagos.map((pago) => (
+              <div
+                key={pago.id_pagos}
+                onClick={() => router.push(`/pagos/${pago.id_pagos}`)}
+                className="grid grid-cols-[2fr_1.2fr_1fr_1.2fr_40px] gap-4 px-6 py-4 border-b border-gray-50 items-center hover:bg-pink-50 cursor-pointer transition duration-150 last:border-b-0"
+              >
+                <span className="font-medium text-gray-800 text-sm">{pago.nombre_apellido}</span>
+                <span className="text-gray-400 text-sm">{pago.dni}</span>
+                <span className="text-gray-400 text-sm">{formatFecha(pago.fecha_pago)}</span>
+                <span className="font-medium text-green-700 text-sm">{formatMonto(pago.monto)}</span>
+                <span className="text-gray-300 text-lg">›</span>
+              </div>
+            ))
+          )}
         </div>
-      ) : (
-        <p className="text-center text-gray-700">No se encontraron pagos.</p>
-      )}
+
+        {pagos.length > 0 && (
+          <p className="text-xs text-gray-400 text-right mt-3">
+            {pagos.length} pago{pagos.length !== 1 ? "s" : ""} encontrado{pagos.length !== 1 ? "s" : ""}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
