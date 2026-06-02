@@ -18,7 +18,7 @@
     "joi": "^17.13.3",
     "jspdf": "^2.5.2",
     "mysql2": "^3.12.0",
-    "next": "^16.2.7",
+    "next": "15.1.4",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -29,5 +29,10 @@
     "eslint-config-next": "15.1.4",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17"
+  },
+  "overrides": {
+    "next-auth": {
+      "next": "$next"
+    }
   }
 }
