@@ -15,9 +15,9 @@ Sistema de gestión de pagos para una escuela de inglés. Permite al administrad
 ## Funcionalidades
 
 -  **Autenticación segura** — Login y registro de administrador con NextAuth.js y contraseñas hasheadas con bcryptjs
--  **Registro de pagos** — Alta de nuevos pagos con datos del alumno, monto y fecha
+-  **Registro de pagos** — Alta de nuevos pagos con datos
 -  **Historial de pagos** — Listado completo de todos los pagos registrados
--  **Búsqueda por nombre** — Filtrado rápido de pagos por nombre de alumno
+-  **Búsqueda por nombre** — Filtrado rápido de pagos por nombre
 -  **Edición de pagos** — Modificación de registros existentes
 -  **Eliminación de pagos** — Borrado de registros con confirmación
 -  **Comprobante PDF** — Generación de comprobante de pago para entregar al alumno
@@ -39,6 +39,7 @@ Sistema de gestión de pagos para una escuela de inglés. Permite al administrad
 | [Material UI](https://mui.com/) | Componentes de interfaz |
 | [Tailwind CSS](https://tailwindcss.com/) | Estilos utilitarios |
 | [Vercel](https://vercel.com/) | Deploy |
+| [Aiven](https://https://aiven.io/) | Base de Datos |
 
 ---
 
