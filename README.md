@@ -2,7 +2,7 @@
 
 Sistema de gestión de pagos para una escuela de inglés. Permite al administrador registrar, consultar, editar y eliminar pagos de cuotas mensuales, con generación de comprobantes en PDF.
 
-## Demo en vivo:[shine-pagos.vercel.app](https://shine-pagos.vercel.app)
+## Demo en vivo:[shine-pagos.vercel.app](https://shine-pagos.vercel.app/)
 
 ---
 
