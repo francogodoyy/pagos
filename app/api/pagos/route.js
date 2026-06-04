@@ -48,13 +48,28 @@ export async function POST(req) {
       direccion,
     } = value;
 
+    // ✅ Usar la fecha y hora ACTUAL del servidor
+    const now = new Date();
+    
+    // Convertir a formato MySQL: YYYY-MM-DD HH:MM:SS
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const mysqlDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+    console.log("Fecha y hora del servidor:", mysqlDateTime);
+
     await db.query(
       "INSERT INTO pagos (nombre_apellido, dni, monto, fecha_pago, descripcion, correo, localidad, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         nombre_apellido,
         dni,
-        monto,
-        fecha_pago,
+        parseFloat(monto),
+        mysqlDateTime,
         descripcion,
         correo,
         localidad,
@@ -64,6 +79,7 @@ export async function POST(req) {
     );
     return new Response("Pago registrado con éxito", { status: 201 });
   } catch (error) {
+    console.error("Error:", error);
     return new Response("Error interno en el servidor", { status: 500 });
   }
 }
@@ -124,7 +140,6 @@ export async function DELETE(req) {
       return new Response("ID de pago no proporcionado", { status: 400 });
     }
 
-    // 
     await db.query("DELETE FROM pagos WHERE id_pagos = ?", [id]);
 
     return new Response("Pago eliminado con éxito", { status: 200 });

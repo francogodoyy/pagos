@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { generatePDF } from "@/utils/pdf";
 
+
 export default function DetallePago() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -69,17 +70,18 @@ export default function DetallePago() {
   };
 
   const formatFechaHora = (fecha) => {
-    const date = new Date(fecha);
-    const offset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() - offset);
-    return localDate.toLocaleString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const fechaPago = new Date(fecha);
+  const fechaFormato = fechaPago.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const horaFormato = fechaPago.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${fechaFormato}, ${horaFormato}`;
+};
 
   const formatMonto = (monto) => {
     return new Intl.NumberFormat("es-AR", {

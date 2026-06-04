@@ -100,21 +100,38 @@ export default function Pagos() {
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <img src="/shinee.png" alt="Shine Logo" className="w-12 h-12 object-contain" />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Historial de pagos</h1>
-              <p className="text-sm text-gray-500">{session.user.email}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => router.push("/nuevo-pago")}
-            className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-          >
-            + Nuevo pago
-          </button>
-        </div>
+        <div className="mb-8">
+  <div className="flex items-center justify-between">
+    <div>
+      <span className="text-pink-600 text-sm font-medium">
+        Shine
+      </span>
+
+      <h1 className="text-3xl font-semibold text-gray-800 mt-1">
+        Historial de pagos
+      </h1>
+
+      <p className="text-gray-500 text-sm mt-1">
+        Consultá, buscá y administrá los pagos realizados.
+      </p>
+    </div>
+
+    <button
+      onClick={() => router.push("/nuevo-pago")}
+      className="
+        bg-pink-600
+        hover:bg-pink-700
+        text-white
+        px-5
+        py-3
+        rounded-xl
+        font-medium
+      "
+    >
+      Nuevo pago
+    </button>
+  </div>
+</div>  
 
         {/* Filtros */}
         <div className="bg-white rounded-xl p-4 mb-4 shadow-sm flex flex-wrap gap-3 items-center">

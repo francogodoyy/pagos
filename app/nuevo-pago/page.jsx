@@ -27,19 +27,21 @@ export default function NuevoPago() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await fetch("/api/pagos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+  e.preventDefault();
 
-    if (res.ok) {
-      setSuccess(true);
-    } else {
-      alert("Error al registrar el pago");
-    }
-  };
+  
+  const res = await fetch("/api/pagos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData), // Envía como está
+  });
+
+  if (res.ok) {
+    setSuccess(true);
+  } else {
+    alert("Error al registrar el pago");
+  }
+};
 
   if (success) {
     return (
@@ -240,3 +242,4 @@ export default function NuevoPago() {
     </div>
   );
 }
+  
