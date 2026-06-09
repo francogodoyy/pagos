@@ -10,7 +10,7 @@ const pagoSchema = Joi.object({
     .pattern(/^\d{8}$/)
     .required(),
   monto: Joi.number().min(0).required(),
-  fecha_pago: Joi.date().iso().required(),
+  fecha_pago: Joi.string().isoDate().required(),
   descripcion: Joi.string().max(255).optional(),
   correo: Joi.string().email().required(),
   localidad: Joi.string().max(100).required(),
@@ -48,20 +48,22 @@ export async function POST(req) {
       direccion,
     } = value;
 
-    // ✅ Usar la fecha y hora ACTUAL del servidor
-    const now = new Date();
+   
+    const fechaParts = fecha_pago.split('T')[0].split('-'); 
+    const year = fechaParts[0];
+    const month = fechaParts[1];
+    const day = fechaParts[2];
     
-    // Convertir a formato MySQL: YYYY-MM-DD HH:MM:SS
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    // Hora actual del servidor
+    const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     
+    // Formato MySQL: YYYY-MM-DD HH:MM:SS
     const mysqlDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-    console.log("Fecha y hora del servidor:", mysqlDateTime);
+    console.log("Fecha guardada:", mysqlDateTime);
 
     await db.query(
       "INSERT INTO pagos (nombre_apellido, dni, monto, fecha_pago, descripcion, correo, localidad, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",

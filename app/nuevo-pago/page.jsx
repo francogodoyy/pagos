@@ -17,6 +17,7 @@ export default function NuevoPago() {
     direccion: "",
   });
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleVolver = () => {
     router.push("/pagos");
@@ -27,21 +28,40 @@ export default function NuevoPago() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  
-  const res = await fetch("/api/pagos", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(formData), // Envía como está
-  });
+    const dateParts = formData.fecha_pago.split("-"); // ["2026", "05", "01"]
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1; // JS usa 0-11
+    const day = parseInt(dateParts[2]);
 
-  if (res.ok) {
-    setSuccess(true);
-  } else {
-    alert("Error al registrar el pago");
-  }
-};
+    // Crear fecha en timezone local
+    const fechaLocal = new Date(year, month, day, 0, 0, 0);
+    
+    // Convertir a ISO string para enviar al servidor
+    const fechaISO = fechaLocal.toISOString();
+
+    try {
+      const res = await fetch("/api/pagos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          fecha_pago: fechaISO, // Envía con conversión correcta
+        }),
+      });
+
+      if (res.ok) {
+        setSuccess(true);
+        setError("");
+      } else {
+        const errorMsg = await res.text();
+        setError(errorMsg || "Error al registrar el pago");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   if (success) {
     return (
@@ -66,6 +86,13 @@ export default function NuevoPago() {
         <h1 className="text-2xl font-semibold text-gray-800 text-center">
           Registrar Pago
         </h1>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+            {error}
+          </div>
+        )}
+
         <div>
           <label
             htmlFor="nombre_apellido"
@@ -242,4 +269,3 @@ export default function NuevoPago() {
     </div>
   );
 }
-  
