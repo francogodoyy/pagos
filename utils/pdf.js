@@ -79,12 +79,12 @@ export const generatePDF = (pagos) => {
     doc.setDrawColor(0, 0, 0); // Negro
     doc.line(20, yPosition, pageWidth - 20, yPosition);
 
-    // ===== DATOS DEL ALUMNO =====
+    // ===== DATOS DE PAGO  =====
     yPosition += 8;
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     doc.setFont(undefined, "bold");
-    doc.text("DATOS DEL ALUMNO", 20, yPosition);
+    doc.text("DATOS DE PAGO", 20, yPosition);
 
     yPosition += 8;
     doc.setFont(undefined, "normal");
