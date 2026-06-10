@@ -1,8 +1,42 @@
 import { jsPDF } from "jspdf";
 
-export const generatePDF = (pagos) => {
-  if (!Array.isArray(pagos) || pagos.length === 0) {
-    console.error("Error: pagos no es un array válido", pagos);
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0,
+  }).format(Number(value) || 0);
+
+const formatDate = (value) => {
+  if (!value) return "Sin fecha";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  return date.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
+const formatDateTime = (value) => {
+  if (!value) return "Sin fecha";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  const datePart = date.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const timePart = date.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${datePart}, ${timePart}`;
+};
+
+export const generatePDF = (items) => {
+  if (!Array.isArray(items) || items.length === 0) {
+    console.error("Error: items no es un array valido", items);
     return;
   }
 
@@ -12,187 +46,144 @@ export const generatePDF = (pagos) => {
     format: "a4",
   });
 
-  const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  pagos.forEach((pago, index) => {
-    // Agregar nueva página si no es el primer pago
+  items.forEach((item, index) => {
     if (index > 0) {
       doc.addPage();
     }
 
-    let yPosition = 15;
+    const guardianName = item.guardian_name || item.nombre_apellido || "Sin nombre";
+    const studentName = item.student_name || "Sin alumno";
+    const courseName = item.course_name || "Sin curso";
+    const courseLevel = item.course_level || "Nivel no definido";
+    const period = item.period_year && item.period_month
+      ? `${String(item.period_month).padStart(2, "0")}/${item.period_year}`
+      : "Sin periodo";
+    const dueDate = formatDate(item.due_date || item.fecha_pago);
+    const paymentDate = formatDateTime(item.fecha_pago || item.due_date);
+    const amount = formatCurrency(item.monto || item.amount);
+    const paidAmount = formatCurrency(item.paid_amount || item.allocated_amount || 0);
+    const balance = formatCurrency(item.balance || 0);
+    const status = item.charge_status || item.status || "pending";
 
-    // ===== HEADER CON LOGO =====
+    let y = 18;
+
     try {
-      doc.addImage("/shinee.png", "PNG", 20, yPosition - 5, 30, 30);
+      doc.addImage("/shinee.png", "PNG", 18, y - 6, 28, 28);
     } catch (error) {
-      console.log("Logo no encontrado, continuando sin él");
+      console.log("Logo no encontrado, continuando sin el");
     }
 
-    yPosition += 8;
     doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0); // Negro
     doc.setFont(undefined, "bold");
-    
+    doc.text("Comprobante de cuota", 60, y + 2);
 
-    yPosition += 10;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont(undefined, "normal");
-    
-
-
-    yPosition += 10;
-    doc.setLineWidth(0.5);
-    doc.setDrawColor(0, 0, 0); // Negro
-    doc.line(20, yPosition, pageWidth - 20, yPosition);
-
-    yPosition += 10;
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("COMPROBANTE DE PAGO", 20, yPosition);
-
-    yPosition += 12;
-
-    // ===== DATOS DEL COMPROBANTE =====
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.setFont(undefined, "normal");
-
-    const fechaPago = new Date(pago.fecha_pago);
-    const fechaFormato = fechaPago.toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-
-    doc.text(`Nro. Comprobante: 001-${String(pago.id_pagos).padStart(8, "0")}`, 20, yPosition);
-    doc.text(`Fecha: ${fechaFormato}`, pageWidth - 60, yPosition);
-
-    yPosition += 6;
-    doc.text(`Hora: ${fechaPago.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", minute: "2-digit" })}`, 20, yPosition);
-
-    yPosition += 10;
-    doc.setLineWidth(0.3);
-    doc.setDrawColor(0, 0, 0); // Negro
-    doc.line(20, yPosition, pageWidth - 20, yPosition);
-
-    // ===== DATOS DE PAGO  =====
-    yPosition += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("DATOS DE PAGO", 20, yPosition);
-
-    yPosition += 8;
-    doc.setFont(undefined, "normal");
-    doc.setFontSize(9);
-
-    const datos = [
-      [`Nombre: ${pago.nombre_apellido}`, `DNI: ${pago.dni}`],
-      [`Correo: ${pago.correo}`, `Teléfono: ${pago.telefono}`],
-      [`Localidad: ${pago.localidad}`, ""],
-      [`Dirección: ${pago.direccion}`, ""],
-    ];
-
-    datos.forEach((row) => {
-      doc.text(row[0], 20, yPosition);
-      if (row[1]) {
-        doc.text(row[1], pageWidth / 2, yPosition);
-      }
-      yPosition += 5;
-    });
-
-    yPosition += 5;
-    doc.setLineWidth(0.3);
-    doc.setDrawColor(0, 0, 0); // Negro
-    doc.line(20, yPosition, pageWidth - 20, yPosition);
-
-    // ===== DETALLE DEL PAGO =====
-    yPosition += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, "bold");
-    doc.text("DETALLE DEL PAGO", 20, yPosition);
-
-    yPosition += 8;
     doc.setFontSize(9);
     doc.setFont(undefined, "normal");
+    doc.setTextColor(90, 90, 90);
+    doc.text(`Nro. Comprobante: 001-${String(item.id_pagos || item.id || 0).padStart(8, "0")}`, 60, y + 10);
+    doc.text(`Estado: ${status}`, 60, y + 15);
 
-    // Encabezado de tabla
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, yPosition - 4, pageWidth - 40, 5, "F");
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(0, 0, 0); // Negro
-    doc.text("Concepto", 22, yPosition);
-    doc.text("Período", 120, yPosition);
-    doc.text("Importe", pageWidth - 25, yPosition, { align: "right" });
+    y = 42;
+    doc.setDrawColor(230, 230, 230);
+    doc.line(18, y, pageWidth - 18, y);
 
-    yPosition += 8;
-    doc.setFont(undefined, "normal");
+    y += 10;
     doc.setTextColor(0, 0, 0);
-
-    doc.text("Cuota Mensual", 22, yPosition);
-
-    const periodo = `${fechaPago.toLocaleString("es-ES", { month: "long", year: "numeric" })}`;
-    doc.text(periodo.charAt(0).toUpperCase() + periodo.slice(1), 120, yPosition);
-
-    const montoFormato = new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-    }).format(pago.monto);
-    doc.text(montoFormato, pageWidth - 25, yPosition, { align: "right" });
-
-    yPosition += 10;
-    doc.setLineWidth(0.5);
-    doc.setDrawColor(0, 0, 0); // Negro
-    doc.line(20, yPosition, pageWidth - 20, yPosition);
-
-    // ===== TOTAL =====
-    yPosition += 8;
-    doc.setFontSize(12);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(0, 0, 0); // Negro
-    doc.text("TOTAL", 20, yPosition);
-    doc.text(montoFormato, pageWidth - 25, yPosition, { align: "right" });
-
-    yPosition += 12;
-    doc.setLineWidth(0.3);
-    doc.setDrawColor(0, 0, 0); // Negro
-    doc.line(20, yPosition, pageWidth - 20, yPosition);
-
-    // ===== ESTADO =====
-    yPosition += 8;
     doc.setFontSize(11);
-    doc.setTextColor(34, 139, 34); // Verde oscuro (mantiene el check)
     doc.setFont(undefined, "bold");
-    doc.text("✓ PAGO ACREDITADO", 20, yPosition);
+    doc.text("Datos principales", 18, y);
 
-    yPosition += 10;
+    y += 8;
     doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
     doc.setFont(undefined, "normal");
+    doc.text(`Responsable: ${guardianName}`, 18, y);
+    y += 6;
+    doc.text(`Alumno: ${studentName}`, 18, y);
+    y += 6;
+    doc.text(`DNI: ${item.dni || "Sin DNI"}`, 18, y);
+    y += 6;
+    doc.text(`Curso: ${courseName} - ${courseLevel}`, 18, y);
 
-    if (pago.descripcion) {
-      doc.text(`Descripción: ${pago.descripcion}`, 20, yPosition);
-      yPosition += 6;
+    y += 10;
+    doc.setDrawColor(230, 230, 230);
+    doc.line(18, y, pageWidth - 18, y);
+
+    y += 10;
+    doc.setFontSize(11);
+    doc.setFont(undefined, "bold");
+    doc.text("Detalle de la cuota", 18, y);
+
+    y += 8;
+    doc.setFontSize(9);
+    doc.setFont(undefined, "normal");
+    doc.text(`Periodo: ${period}`, 18, y);
+    doc.text(`Vencimiento: ${dueDate}`, pageWidth / 2, y);
+
+    y += 6;
+    doc.text(`Ultimo movimiento: ${paymentDate}`, 18, y);
+
+    y += 10;
+    doc.setFillColor(247, 247, 247);
+    doc.roundedRect(18, y - 4, pageWidth - 36, 28, 2, 2, "F");
+    doc.setFontSize(10);
+    doc.setFont(undefined, "bold");
+    doc.text("Monto total", 22, y + 3);
+    doc.text("Cobrado", 82, y + 3);
+    doc.text("Saldo", 130, y + 3);
+    doc.text(amount, pageWidth - 22, y + 3, { align: "right" });
+    doc.setFont(undefined, "normal");
+    doc.text(paidAmount, 82, y + 9);
+    doc.text(balance, 130, y + 9);
+
+    y += 20;
+    doc.setDrawColor(230, 230, 230);
+    doc.line(18, y, pageWidth - 18, y);
+
+    y += 10;
+    doc.setFontSize(10);
+    doc.setFont(undefined, "bold");
+    doc.text("Observaciones", 18, y);
+
+    y += 7;
+    doc.setFont(undefined, "normal");
+    const note = item.descripcion || item.notes || "Sin observaciones";
+    const lines = doc.splitTextToSize(note, pageWidth - 36);
+    doc.text(lines, 18, y);
+    y += lines.length * 5 + 8;
+
+    if (Array.isArray(item.payments) && item.payments.length > 0) {
+      doc.setFont(undefined, "bold");
+      doc.text("Historial de pagos", 18, y);
+      y += 7;
+      doc.setFont(undefined, "normal");
+
+      item.payments.forEach((payment) => {
+        const paymentLine = `${formatDateTime(payment.payment_date)} | ${formatCurrency(payment.amount)} | ${payment.method || "cash"}`;
+        const paymentLines = doc.splitTextToSize(paymentLine, pageWidth - 36);
+        doc.text(paymentLines, 18, y);
+        y += paymentLines.length * 5 + 2;
+      });
     }
 
-    // ===== FOOTER =====
-    const footerY = pageHeight - 20;
+    const footerY = doc.internal.pageSize.getHeight() - 18;
     doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Comprobante de pago generado automáticamente por SHINE INGLÉS", pageWidth / 2, footerY, {
-      align: "center",
-    });
-    doc.text(`Este documento tiene valor probatorio del pago realizado. Fecha de emisión: ${new Date().toLocaleDateString("es-ES")}`, pageWidth / 2, footerY + 5, {
-      align: "center",
-    });
+    doc.setTextColor(140, 140, 140);
+    doc.text(
+      "Documento generado automaticamente por la plataforma de gestion de cuotas.",
+      pageWidth / 2,
+      footerY,
+      { align: "center" }
+    );
+    doc.text(
+      `Fecha de emision: ${formatDate(new Date())}`,
+      pageWidth / 2,
+      footerY + 5,
+      { align: "center" }
+    );
   });
 
-  // Descargar PDF
-  const fecha = new Date().toLocaleDateString("es-ES").replace(/\//g, "-");
-  doc.save(`comprobante-pago-${fecha}.pdf`);
+  const fileDate = new Date().toLocaleDateString("es-ES").replace(/\//g, "-");
+  doc.save(`comprobante-cuota-${fileDate}.pdf`);
 };

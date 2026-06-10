@@ -1,14 +1,16 @@
-"use client";
-
 import './global.css';
-import { SessionProvider } from 'next-auth/react';
+import SessionProviderWrapper from '@/components/SessionProviderWrapper';
 
+export const metadata = {
+  title: "Shine Pagos",
+  description: "Sistema de gestión de cobro de cuotas escolares",
+};
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProviderWrapper>{children}</SessionProviderWrapper>
       </body>
     </html>
   );

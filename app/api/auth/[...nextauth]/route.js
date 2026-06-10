@@ -34,7 +34,12 @@ export const authOptions = {
         }
 
         // Retorna el usuario si es válido
-        return { id: user.id, email: user.email, role: user.role };
+        return {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          organization_id: user.organization_id,
+        };
       },
     }),
   ],
