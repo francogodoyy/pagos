@@ -1,7 +1,7 @@
 import mysql from "mysql2/promise";
 
 // Evita la creación de múltiples pools de conexiones en desarrollo (por hot reloading)
-// y en producción (en funciones serverless de Vercel/Railway), previniendo saturar la base de datos en Aiven.
+// y en producción (en funciones serverless de Vercel), previniendo saturar la base de datos en Aiven.
 let pool;
 
 if (!global.dbPool) {
@@ -15,7 +15,7 @@ if (!global.dbPool) {
       rejectUnauthorized: false,
     },
     waitForConnections: true,
-    connectionLimit: 3, // Límite por instancia serverless (óptimo para Aiven)
+    connectionLimit: 3, 
     queueLimit: 0,
   });
 }
