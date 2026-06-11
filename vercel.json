@@ -5,5 +5,11 @@
       "destination": "/admin/login",
       "permanent": true
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/actualizar-vencidas",
+      "schedule": "5 0 * * *"
+    }
   ]
 }
