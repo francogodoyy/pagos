@@ -1,13 +1,9 @@
 import { db } from "@/utils/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getCurrentOrganizationId } from "@/utils/charges";
 
 const editableStatuses = ["pending", "partial", "paid", "overdue", "canceled"];
-
-const getCurrentOrganizationId = (session) => {
-  const organizationId = session?.user?.organization_id;
-  return organizationId ? Number(organizationId) : null;
-};
 
 const ensureAuditTable = async (connection = db) => {
   await connection.query(`

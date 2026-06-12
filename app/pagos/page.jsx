@@ -397,6 +397,13 @@ export default function Pagos() {
             </button>
             <button
               type="button"
+              onClick={() => router.push("/dashboard")}
+              className="inline-flex items-center justify-center rounded-xl border border-pink-200 bg-white px-5 py-3 text-sm font-semibold text-pink-600 transition duration-200 hover:bg-pink-50 focus:outline-none focus:ring-4 focus:ring-pink-100"
+            >
+              Dashboard
+            </button>
+            <button
+              type="button"
               onClick={() => router.push("/nuevo-pago")}
               className="inline-flex items-center justify-center rounded-xl bg-pink-600 px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-100"
             >
