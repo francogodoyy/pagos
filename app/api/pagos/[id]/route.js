@@ -281,6 +281,11 @@ export async function PUT(req, { params }) {
         return new Response("Pago no encontrado", { status: 404 });
       }
 
+      if (!["owner", "admin"].includes(session.user?.role)) {
+        await connection.rollback();
+        return new Response("No tenes permiso para editar cuotas", { status: 403 });
+      }
+
       const oldData = rows[0];
       const normalizedDate = new Date(dueDate).toISOString().slice(0, 10);
       const nextData = {
@@ -354,6 +359,11 @@ export async function DELETE(req, { params }) {
       if (rows.length === 0) {
         await connection.rollback();
         return new Response("Pago no encontrado", { status: 404 });
+      }
+
+      if (!["owner", "admin"].includes(session.user?.role)) {
+        await connection.rollback();
+        return new Response("No tenes permiso para cancelar cuotas", { status: 403 });
       }
 
       await connection.query(

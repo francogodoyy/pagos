@@ -402,6 +402,30 @@ export default function Pagos() {
             >
               Dashboard
             </button>
+            {["owner", "admin"].includes(session?.user?.role) && (
+              <button
+                type="button"
+                onClick={() => router.push("/admin/usuarios")}
+                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition duration-200 hover:border-pink-200 hover:bg-pink-50 focus:outline-none focus:ring-4 focus:ring-pink-100"
+              >
+                Usuarios
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                const params = new URLSearchParams();
+                if (filtro.dni) params.append("dni", filtro.dni);
+                if (filtro.guardian_name) params.append("guardian_name", filtro.guardian_name);
+                if (filtro.course_name) params.append("course_name", filtro.course_name);
+                if (filtro.status) params.append("status", filtro.status);
+                if (filtro.period) params.append("period", filtro.period);
+                window.open(`/api/pagos/export?${params.toString()}`, "_blank");
+              }}
+              className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition duration-200 hover:border-pink-200 hover:bg-pink-50 focus:outline-none focus:ring-4 focus:ring-pink-100"
+            >
+              Exportar
+            </button>
             <button
               type="button"
               onClick={() => router.push("/nuevo-pago")}

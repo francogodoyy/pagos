@@ -7,18 +7,20 @@ export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
   const isLoginRoute = pathname === "/admin/login";
-  const isProtectedRoute = pathname.startsWith("/pagos") || pathname.startsWith("/nuevo-pago");
-  const isRoot = pathname === "/"; // 
+  const isRegisterRoute = pathname === "/admin/register";
+  const isProtectedRoute =
+    pathname.startsWith("/pagos") ||
+    pathname.startsWith("/nuevo-pago") ||
+    pathname.startsWith("/dashboard") ||
+    (pathname.startsWith("/admin/") && !isLoginRoute && !isRegisterRoute);
 
-  // Si el usuario no está autenticado y trata de acceder a rutas protegidas
   if (!token && isProtectedRoute) {
     return NextResponse.redirect(new URL("/admin/login", req.url));
   }
-
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/pagos/:path*", "/nuevo-pago"], 
+  matcher: ["/admin/:path*", "/pagos/:path*", "/nuevo-pago", "/dashboard"],
 };

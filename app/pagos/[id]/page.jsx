@@ -503,20 +503,24 @@ export default function DetallePago() {
                   </button>
                   {!confirmandoEliminar && !confirmandoBorrar ? (
                     <>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmandoEliminar(true)}
-                        className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-700 transition duration-200 hover:bg-amber-100 focus:outline-none focus:ring-4 focus:ring-amber-100"
-                      >
-                        Cancelar cuota
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmandoBorrar(true)}
-                        className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 transition duration-200 hover:bg-red-100 focus:outline-none focus:ring-4 focus:ring-red-100"
-                      >
-                        Eliminar cuota
-                      </button>
+                      {["owner", "admin"].includes(session.user.role) && (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmandoEliminar(true)}
+                          className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-700 transition duration-200 hover:bg-amber-100 focus:outline-none focus:ring-4 focus:ring-amber-100"
+                        >
+                          Cancelar cuota
+                        </button>
+                      )}
+                      {session.user.role === "owner" && (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmandoBorrar(true)}
+                          className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 transition duration-200 hover:bg-red-100 focus:outline-none focus:ring-4 focus:ring-red-100"
+                        >
+                          Eliminar cuota
+                        </button>
+                      )}
                     </>
                   ) : confirmandoEliminar ? (
                     <div className="flex gap-2">

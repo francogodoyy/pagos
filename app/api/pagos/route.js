@@ -584,6 +584,10 @@ export async function DELETE(req) {
     return new Response("No autorizado", { status: 401 });
   }
 
+  if (session.user?.role !== "owner") {
+    return new Response("Solo el propietario puede eliminar cuotas", { status: 403 });
+  }
+
   const organizationId = getCurrentOrganizationId(session);
   if (!organizationId) {
     return new Response("La sesion no tiene organization_id", { status: 400 });
