@@ -446,7 +446,7 @@ export default function NuevoPago() {
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.55fr]">
           <aside className="space-y-6">
             <div className="rounded-3xl border border-white/70 bg-white/85 p-6 shadow-[0_20px_60px_rgba(236,72,153,0.08)] backdrop-blur">
-              <div className="rounded-3xl bg-gradient-to-br from-pink-600 to-rose-500 p-5 text-white shadow-lg shadow-pink-200">
+              <div className="rounded-3xl bg-gradient-to-br from-pink-300 to-rose-300 p-5 text-white shadow-lg shadow-pink-200">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-pink-100">
                   Guía rápida
                 </p>
@@ -714,7 +714,7 @@ export default function NuevoPago() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded-xl bg-pink-600 px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-pink-400 focus:outline-none focus:ring-4 focus:ring-pink-100"
+                className="rounded-xl bg-pink-400 px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-pink-400 focus:outline-none focus:ring-4 focus:ring-pink-100"
               >
                 {isSubmitting ? "Guardando..." : "Guardar cuota"}
               </button>
