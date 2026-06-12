@@ -163,6 +163,12 @@ export default function Pagos() {
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [monthlyPeriod, setMonthlyPeriod] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const [monthlyTotal, setMonthlyTotal] = useState(null);
+  const [monthlyLoading, setMonthlyLoading] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -234,10 +240,30 @@ export default function Pagos() {
         hasMore: Boolean(data.hasMore),
       });
       setError("");
+      fetchMonthlyTotal(monthlyPeriod);
     } catch (err) {
       setError(err.message || "Error inesperado");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMonthlyTotal = async (period) => {
+    if (!period) {
+      setMonthlyTotal(null);
+      return;
+    }
+    setMonthlyLoading(true);
+    try {
+      const res = await fetch(`/api/pagos/total-mes?period=${period}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMonthlyTotal(data.totalPaid);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setMonthlyLoading(false);
     }
   };
 
@@ -246,6 +272,20 @@ export default function Pagos() {
     cargarPagos(filtro, 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, session]);
+
+  useEffect(() => {
+    fetchMonthlyTotal(monthlyPeriod);
+  }, [monthlyPeriod]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        fetchMonthlyTotal(monthlyPeriod);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [monthlyPeriod]);
 
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
@@ -376,11 +416,30 @@ export default function Pagos() {
             value={pagos.length}
             helper={`Mostrando ${showingFrom}-${showingTo} de ${pagination.total}.`}
           />
-          <StatCard
-            label="Cobrado visible"
-            value={formatMonto(summary.totalPaid)}
-            helper="Suma de la pagina actual."
-          />
+          <div className="rounded-2xl border border-white/70 bg-white/90 p-5 shadow-[0_18px_50px_rgba(236,72,153,0.08)] backdrop-blur">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+                Cobrado visible
+              </p>
+              <input
+                type="month"
+                value={monthlyPeriod}
+                onChange={(e) => setMonthlyPeriod(e.target.value)}
+                className="w-32 rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 outline-none transition duration-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100"
+              />
+            </div>
+            <p className="mt-3 text-2xl font-semibold text-gray-900">
+              {monthlyLoading ? "..." : formatMonto(monthlyTotal)}
+            </p>
+            {monthlyPeriod && (() => {
+              const [y, m] = monthlyPeriod.split("-").map(Number);
+              return (
+                <p className="mt-1 text-sm text-gray-500">
+                  Total de {formatPeriodo(y, m)}
+                </p>
+              );
+            })()}
+          </div>
           <StatCard
             label="Pendiente visible"
             value={formatMonto(summary.totalBalance)}

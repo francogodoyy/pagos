@@ -2,6 +2,8 @@ import { db } from "@/utils/db";
 import Joi from "joi";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { sendEmail } from "@/utils/email";
+import { receiptTemplate } from "@/utils/email-templates";
 
 const paymentSchema = Joi.object({
   guardian_name: Joi.string().max(150).allow("", null).optional(),
@@ -151,6 +153,66 @@ const getPaymentSummaryQuery = (whereClause = "", extraParams = []) => {
 
   return { sql, params: extraParams };
 };
+
+async function sendEmailReceipt({ organizationId, chargeId, paymentId, chargeStatus, chargeAmount, newPaid, allocationAmount, method }) {
+  try {
+    const [rows] = await db.query(
+      `
+        SELECT
+          f.email, f.guardian_name, s.full_name AS student_name,
+          co.name AS course_name, c.period_year, c.period_month,
+          c.due_date, o.name AS org_name
+        FROM charges c
+        INNER JOIN enrollments e ON e.id = c.enrollment_id
+        INNER JOIN students s ON s.id = e.student_id
+        INNER JOIN families f ON f.id = s.family_id
+        INNER JOIN courses co ON co.id = e.course_id
+        INNER JOIN organizations o ON o.id = c.organization_id
+        WHERE c.id = ? AND c.organization_id = ?
+        LIMIT 1
+      `,
+      [chargeId, organizationId]
+    );
+
+    if (!rows[0]?.email) return;
+
+    const charge = rows[0];
+    const periodLabel = `${String(charge.period_month).padStart(2, "0")}/${charge.period_year}`;
+    const rawDate = charge.due_date;
+    let dueDate = "Sin fecha";
+    if (rawDate) {
+      const d = rawDate instanceof Date ? rawDate : new Date(rawDate);
+      if (!Number.isNaN(d.getTime())) {
+        dueDate = new Intl.DateTimeFormat("es-ES", {
+          day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC",
+        }).format(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
+      }
+    }
+
+    const html = receiptTemplate({
+      guardianName: charge.guardian_name,
+      studentName: charge.student_name,
+      courseName: charge.course_name,
+      periodLabel,
+      monto: chargeAmount,
+      paidAmount: newPaid,
+      balance: Math.max(chargeAmount - newPaid, 0),
+      chargeStatus,
+      method,
+      dueDate,
+      pagoId: paymentId,
+      orgName: charge.org_name,
+    });
+
+    await sendEmail({
+      to: charge.email,
+      subject: `Comprobante de pago - ${charge.student_name} - ${periodLabel}`,
+      html,
+    });
+  } catch (err) {
+    console.error("[EMAIL RECEIPT ERROR]", err);
+  }
+}
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
@@ -406,6 +468,17 @@ export async function POST(req) {
       await connection.query("UPDATE charges SET status = ? WHERE id = ?", [chargeStatus, chargeId]);
 
       await connection.commit();
+
+      sendEmailReceipt({
+        organizationId,
+        chargeId,
+        paymentId,
+        chargeStatus,
+        chargeAmount,
+        newPaid,
+        allocationAmount,
+        method,
+      });
 
       return new Response(
         JSON.stringify({
