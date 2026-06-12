@@ -1,15 +1,23 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend;
+
+function getResend() {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 export async function sendEmail({ to, subject, html }) {
-  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_xxxxxxxxxxxxx") {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || apiKey === "re_xxxxxxxxxxxxx") {
     console.log("[EMAIL DEV] Para:", to, "| Asunto:", subject);
     return;
   }
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: process.env.EMAIL_FROM || "onboarding@resend.dev",
       to,
       subject,
