@@ -12,6 +12,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.4.0",
+    "@sentry/nextjs": "^10.57.0",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
