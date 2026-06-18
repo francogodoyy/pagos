@@ -49,6 +49,21 @@ Sistema de gestión de pagos para escuelas. Multi-tenant, SaaS-ready.
 
 ---
 
+##  Capturas de pantalla
+
+| | |
+|---|---|
+| ![Login](assets/screenshots/login.jpg) | ![Dashboard](assets/screenshots/dashboard.jpg) |
+| **Inicio de sesión** — Acceso seguro con NextAuth | **Dashboard** — Métricas en vivo y gráficos |
+| ![Nuevo pago](assets/screenshots/nuevoPago1.jpg) | ![Nuevo pago](assets/screenshots/nuevoPago2.png) |
+| **Registro de pago** — Formulario con datos del responsable, alumno y curso | **Registro de pago** — Monto, método y fecha de vencimiento |
+| ![Detalle de cuota](assets/screenshots/detalle.jpg) | ![Comprobante PDF](assets/screenshots/pagoID.jpg) |
+| **Detalle de cuota** — Historial de pagos y línea de tiempo | **Comprobante PDF** — Recibo generado con jsPDF |
+| ![Gestión de usuarios](assets/screenshots/admin.jpg) | |
+| **Usuarios** — Administración de roles (owner/admin/assistant) | |
+
+---
+
 ##  Stack tecnológico
 
 | Tecnología | Uso |
