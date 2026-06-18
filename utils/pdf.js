@@ -34,7 +34,9 @@ const formatDate = (value) => {
 const formatDateTime = (value) => {
   const date = parseDateSafe(value);
   if (!date) return "Sin fecha";
-  return `${new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(date)}, ${new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).format(date)}`;
+  const datePart = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(date);
+  const timePart = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(date);
+  return `${datePart}, ${timePart}`;
 };
 
 const hexToRgb = (hex) => {
