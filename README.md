@@ -61,7 +61,8 @@ Sistema de gestión de pagos para escuelas. Multi-tenant, SaaS-ready.
 | **Dashboard** — Métricas | **Detalle del Pago** — Detalle de los pagos |
 | ![Gestión de usuarios](assets/screenshots/admin.jpg) | |
 | **Usuarios** — Administración de roles (owner/admin/assistant) | |
-
+| ![PDF](assets/screenshots/pdf.jpg) |
+| **PDF** — PDF generado con jsPDF |
 ---
 
 ##  Stack tecnológico
