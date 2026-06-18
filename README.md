@@ -1,6 +1,6 @@
 # Shine Pagos
 
-Sistema de gestión de pagos para una escuela de inglés. Multi-tenant, SaaS-ready.
+Sistema de gestión de pagos para escuelas. Multi-tenant, SaaS-ready.
 
 ## Demo en vivo
 
