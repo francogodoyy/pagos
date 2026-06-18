@@ -13,22 +13,28 @@ const formatCurrency = (value) =>
     minimumFractionDigits: 0,
   }).format(Number(value) || 0);
 
-const formatDate = (value) => {
-  if (!value) return "Sin fecha";
+const parseDateSafe = (value) => {
+  if (!value) return null;
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1, d));
+  }
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Sin fecha";
-  return date.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const formatDate = (value) => {
+  const date = parseDateSafe(value);
+  if (!date) return "Sin fecha";
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC",
+  }).format(date);
 };
 
 const formatDateTime = (value) => {
-  if (!value) return "Sin fecha";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Sin fecha";
-  return `${date.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })}, ${date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`;
+  const date = parseDateSafe(value);
+  if (!date) return "Sin fecha";
+  return `${new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(date)}, ${new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).format(date)}`;
 };
 
 const hexToRgb = (hex) => {
